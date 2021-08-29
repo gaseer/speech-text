@@ -1,23 +1,30 @@
-        var speech = true;
-        window.SpeechRecognition = window.SpeechRecognition
-                        || window.webkitSpeechRecognition;
-  
-        const recognition = new SpeechRecognition();
-        recognition.interimResults = true;
-        const words = document.querySelector('.words');
-        words.appendChild(p);
-  
-        recognition.addEventListener('result', e => {
-            const transcript = Array.from(e.results)
-                .map(result => result[0])
-                .map(result => result.transcript)
-                .join('')
-  
-            document.getElementById("p").innerHTML = transcript;
-            console.log(transcript);
-        });
-          
-        if (speech == true) {
-            recognition.start();
-            recognition.addEventListener('end', recognition.start);
-        }
+		    function runSpeechRecognition() {
+		        // get output div reference
+		        var output = document.getElementById("output");
+		        // get action element reference
+		        var action = document.getElementById("action");
+                // new speech recognition object
+                var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition;
+                var recognition = new SpeechRecognition();
+            
+                // This runs when the speech recognition service starts
+                recognition.onstart = function() {
+                    action.innerHTML = "<small>listening, please speak...</small>";
+                };
+                
+                recognition.onspeechend = function() {
+                    action.innerHTML = "<small>stopped listening, hope you are done...</small>";
+                    recognition.stop();
+                }
+              
+                // This runs when the speech recognition service returns result
+                recognition.onresult = function(event) {
+                    var transcript = event.results[0][0].transcript;
+                    var confidence = event.results[0][0].confidence;
+                    output.innerHTML = "<b>Text:</b> " + transcript + "<br/> <b>Confidence:</b> " + confidence*100+"%";
+                    output.classList.remove("hide");
+                };
+              
+                 // start recognition
+                 recognition.start();
+	        }		
